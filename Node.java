@@ -6,4 +6,9 @@ public class Node {
     public Node(int data) {
         this.data = data;
     }
+
+    public boolean hasNext() {
+        return next != null;
+    }
 }
+

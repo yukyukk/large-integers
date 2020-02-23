@@ -25,7 +25,7 @@ public class HugeInteger {
 
         for (int i = number.length() - 1; i >= scanPosition; i--) {
             int digit = number.charAt(i) - '0';
-            addNode(digit);
+            addNodes(digit);
             length++;
         }
     }
@@ -47,7 +47,7 @@ public class HugeInteger {
         return scanPos;
     }
 
-    private void addNode(int data) {
+    private void addNodes(int data) {
         if (head == null) {
             head = new Node(data);
             tail = head;
@@ -62,6 +62,120 @@ public class HugeInteger {
         tail = current.next;
     }
 
+    public HugeInteger add(HugeInteger other) {
+        return HugeInteger.dreamAdd(this, other);
+    }
+
+    public static HugeInteger dreamAdd(HugeInteger a, HugeInteger b) {
+        int maxLength = Integer.max(a.length, b.length);
+
+        HugeInteger result = new HugeInteger();
+        int carryOver = 0;
+        for (int i = 0; i < maxLength; i++) {
+            int left = a.digitAt(i);
+            int right = b.digitAt(i);
+
+            int sum = left + right + carryOver;
+
+            int digit = 0;
+            if (sum >= 10) {
+                carryOver = 1;
+                digit = sum - 10;
+            } else {
+                carryOver = 0;
+                digit = sum;
+            }
+
+            result.addLast(digit);
+        }
+
+        if (carryOver > 0) {
+            result.addLast(carryOver);
+        }
+
+        return result;
+    }
+
+    private int lastDigitAt = 0;
+    private Node lastDigitNode = null;
+
+    private int digitAt(int pos) {
+        if (pos >= length) {
+            return 0;
+        }
+
+        Node cur = head;
+        int i = 0;
+
+        if (lastDigitNode != null) {
+            if (pos >= lastDigitAt) {
+                i = lastDigitAt;
+                cur = lastDigitNode;
+            }
+        }
+
+        System.out.println("digitAt pos = " + pos);
+
+        while (i < pos) {
+            cur = cur.next;
+            i += 1;
+        }
+
+        lastDigitAt = pos;
+        lastDigitNode = cur;
+
+        return cur.data;
+    }
+
+
+    // TODO doesn't quite work
+    public HugeInteger addRecursive(HugeInteger other) {
+
+        return addNodes(this.head, other.head);
+    }
+
+    // TODO doesn't quite work
+    public HugeInteger addNodes(Node a, Node b) {
+        int left = 0;
+        int right = 0;
+
+        if (a != null) {
+            left = a.data;
+        }
+        if (b != null) {
+            right = b.data;
+        }
+
+        int sum = left + right;
+
+        HugeInteger result = new HugeInteger(Integer.toString(sum));
+
+        Node nextLeft = null;
+        Node nextRight = null;
+
+        if (a != null && a.hasNext()) {
+            nextLeft = a.next;
+        }
+
+        if (b != null && b.hasNext()) {
+            nextRight = b.next;
+        }
+
+        if (nextLeft == null && nextRight == null) {
+            return result;
+        } else {
+            HugeInteger next = addNodes(nextLeft, nextRight);
+
+            Node cur = next.head;
+            while (cur != null) {
+                result.addLast(cur.data);
+                cur = cur.next;
+            }
+            return result;
+        }
+    }
+
+
     public HugeInteger addPositive(HugeInteger num2) {
         Node thisNode = this.head;
         Node num2Node = num2.head;
@@ -72,7 +186,7 @@ public class HugeInteger {
         int lengthCompareCode = compareLength(num2);
         int lengthOfLargerNode = this.length;
 
-        if(lengthCompareCode == -1) {
+        if (lengthCompareCode == -1) {
             lengthOfLargerNode = num2.length;
         }
 
@@ -82,14 +196,12 @@ public class HugeInteger {
 
             if (thisNode == null) {
                 thisData = 0;
-            }
-            else {
+            } else {
                 thisData = thisNode.data;
             }
             if (num2Node == null) {
                 num2Data = 0;
-            }
-            else {
+            } else {
                 num2Data = num2Node.data;
             }
 
@@ -100,7 +212,7 @@ public class HugeInteger {
                 sumDigit -= 10;
                 carryOver = 1;
             }
-            sumHuge.addNode(sumDigit);
+            sumHuge.addNodes(sumDigit);
 
             if (thisNode != null) {
                 thisNode = thisNode.next;
@@ -113,7 +225,7 @@ public class HugeInteger {
             sumHuge.addLast(1);
         }
         return sumHuge;
-        }
+    }
 
     public int compareTo(HugeInteger num2) {
         int compareCode = comparePolarityAndLength(num2);
@@ -143,15 +255,12 @@ public class HugeInteger {
 
         if (this.isPositive && !num2.isPositive) {
             return 1;
-        }
-        else if (!this.isPositive && num2.isPositive) {
+        } else if (!this.isPositive && num2.isPositive) {
             return -1;
-        }
-        else if (!this.isPositive) {
+        } else if (!this.isPositive) {
             if (this.length > num2.length) {
                 return -1;
-            }
-            else if (this.length < num2.length) {
+            } else if (this.length < num2.length) {
                 return 1;
             }
         }
@@ -161,8 +270,7 @@ public class HugeInteger {
     private int compareLength(HugeInteger num2) {
         if (this.length > num2.length) {
             return 1;
-        }
-        else if (this.length < num2.length) {
+        } else if (this.length < num2.length) {
             return -1;
         }
         return 0;
@@ -173,16 +281,13 @@ public class HugeInteger {
         if (!this.isPositive && !num2Pos) {
             if (thisData > num2Data) {
                 return -1;
-            }
-            else if (thisData < num2Data) {
+            } else if (thisData < num2Data) {
                 return 1;
             }
-        }
-        else {
+        } else {
             if (thisData > num2Data) {
                 return 1;
-            }
-            else if (thisData < num2Data) {
+            } else if (thisData < num2Data) {
                 return -1;
             }
         }

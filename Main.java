@@ -1,6 +1,16 @@
 public class Main {
 
     public static void main(String[] args) {
+    	HugeInteger a = new HugeInteger("999923423542358203459820349580293850294385");
+		HugeInteger b = new HugeInteger("1010092384092384092384092384023984023984");
+
+		HugeInteger result2 = HugeInteger.dreamAdd(a, b);
+
+		System.out.println("result2 is " + result2);
+
+	}
+
+	public static void foo() {
 		HugeInteger hi = new HugeInteger();
 		System.out.println(hi);
 		// testing sign
